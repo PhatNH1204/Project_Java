@@ -1,0 +1,51 @@
+/* global styles - Smart Heritage Admin */
+@import "tailwindcss";
+
+:root {
+  --color-primary: #8B4513;        /* Nâu gỗ cổ kính (Saddle Brown) */
+  --color-primary-dark: #5C2D0A;
+  --color-primary-light: #D4956A;
+  --color-gold: #C9A84C;           /* Vàng hoàng gia */
+  --color-gold-light: #F0D080;
+  --color-bg: #FAF7F2;             /* Kem nhạt, giấy dó */
+  --color-sidebar-bg: #2C1810;     /* Nâu đậm như gỗ trầm */
+  --color-sidebar-text: #F5EDD8;
+  --color-sidebar-active: #8B4513;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-bg);
+  color: #2C1810;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Ant Design overrides */
+.ant-menu-dark { background: var(--color-sidebar-bg) !important; }
+.ant-layout-sider { background: var(--color-sidebar-bg) !important; }
+.ant-btn-primary { background: var(--color-primary) !important; border-color: var(--color-primary) !important; }
+.ant-btn-primary:hover { background: var(--color-primary-dark) !important; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1ede4; }
+::-webkit-scrollbar-thumb { background: var(--color-primary-light); border-radius: 3px; }
+
+/* Stat card gradient */
+.stat-card-primary { background: linear-gradient(135deg, #8B4513 0%, #C9A84C 100%); }
+.stat-card-blue    { background: linear-gradient(135deg, #1a56db 0%, #3b82f6 100%); }
+.stat-card-green   { background: linear-gradient(135deg, #057a55 0%, #10b981 100%); }
+.stat-card-purple  { background: linear-gradient(135deg, #6b21a8 0%, #a855f7 100%); }
+
+/* Table row hover */
+.ant-table-tbody > tr:hover > td { background: #FFF8F0 !important; }
+
+/* Badge beacon status */
+.beacon-active   { color: #057a55; }
+.beacon-inactive { color: #9ca3af; }
+.beacon-damaged  { color: #dc2626; }
+.beacon-unassigned { color: #d97706; }
