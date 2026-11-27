@@ -1,0 +1,101 @@
+erDiagram
+    APP_ROLE ||--o{ APP_USER : grants
+    APP_USER ||--o{ FAVORITE : saves
+    ARTIFACT ||--o{ FAVORITE : is_saved
+    HERITAGE_SITE ||--o{ ARTIFACT : contains
+    ARTIFACT ||--o{ ARTIFACT_CONTENT : translated_as
+    SUPPORTED_LANGUAGE ||--o{ ARTIFACT_CONTENT : labels
+    ARTIFACT ||--o{ BEACON_DEVICE : detected_by
+    APP_USER ||--o{ VISITOR_INTERACTION : creates
+    ARTIFACT ||--o{ VISITOR_INTERACTION : records
+    BEACON_DEVICE o|--o{ VISITOR_INTERACTION : triggers
+    SUPPORTED_LANGUAGE ||--o{ VISITOR_INTERACTION : uses
+    APP_USER ||--o{ VISITOR_FEEDBACK : submits
+    ARTIFACT ||--o{ VISITOR_FEEDBACK : receives
+    APP_ROLE {
+        int role_id PK
+        string role_name UK
+        string description
+    }
+    APP_USER {
+        bigint user_id PK
+        int role_id FK
+        string username UK
+        string email UK
+        string password_hash
+        string preferred_language
+        boolean is_active
+        datetime created_at
+    }
+    SUPPORTED_LANGUAGE {
+        string language_code PK
+        string language_name
+        boolean is_active
+    }
+    HERITAGE_SITE {
+        bigint site_id PK
+        string name
+        string description
+        string address
+        decimal latitude
+        decimal longitude
+        boolean is_active
+    }
+    ARTIFACT {
+        bigint artifact_id PK
+        bigint site_id FK
+        string code UK
+        string location_name
+        decimal latitude
+        decimal longitude
+        boolean is_active
+    }
+    ARTIFACT_CONTENT {
+        bigint content_id PK
+        bigint artifact_id FK
+        string language_code FK
+        string title
+        string description
+        string image_url
+        string video_url
+        string audio_url
+    }
+    BEACON_DEVICE {
+        bigint beacon_id PK
+        bigint artifact_id FK
+        string beacon_uuid
+        int major
+        int minor
+        string placement
+        int tx_power
+        boolean is_active
+    }
+    FAVORITE {
+        bigint favorite_id PK
+        bigint user_id FK
+        bigint artifact_id FK
+        datetime created_at
+    }
+    VISITOR_INTERACTION {
+        bigint interaction_id PK
+        string event_key UK
+        bigint user_id FK
+        bigint artifact_id FK
+        bigint beacon_id FK
+        string language_code FK
+        int duration_seconds
+        datetime happened_at
+    }
+    VISITOR_FEEDBACK {
+        bigint feedback_id PK
+        bigint user_id FK
+        bigint artifact_id FK
+        int rating
+        string comment
+        string status
+        datetime created_at
+    }
+    REVOKED_TOKEN {
+        string token_id PK
+        datetime expires_at
+    }

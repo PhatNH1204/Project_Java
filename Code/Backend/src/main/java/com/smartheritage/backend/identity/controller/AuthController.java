@@ -5,7 +5,12 @@ import com.smartheritage.backend.identity.dto.AuthResponse;
 import com.smartheritage.backend.identity.dto.LoginRequest;
 import com.smartheritage.backend.identity.dto.RegisterRequest;
 import com.smartheritage.backend.identity.service.AuthService;
+import com.smartheritage.backend.identity.entity.RevokedToken;
+import com.smartheritage.backend.identity.repository.RevokedTokenRepository;
 import jakarta.validation.Valid;
+import java.time.Instant;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final RevokedTokenRepository revokedTokens;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, RevokedTokenRepository revokedTokens) {
         this.authService = authService;
+        this.revokedTokens = revokedTokens;
     }
 
     @PostMapping("/register")
@@ -38,5 +45,11 @@ public class AuthController {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore())
                 .body(ApiResponse.of(authService.login(request)));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal Jwt jwt) {
+        revokedTokens.save(new RevokedToken(jwt.getId(), jwt.getExpiresAt()));
+        return ResponseEntity.noContent().build();
     }
 }

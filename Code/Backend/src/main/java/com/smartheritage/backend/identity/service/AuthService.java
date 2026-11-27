@@ -10,6 +10,8 @@ import com.smartheritage.backend.identity.entity.Role;
 import com.smartheritage.backend.identity.entity.UserAccount;
 import com.smartheritage.backend.identity.repository.RoleRepository;
 import com.smartheritage.backend.identity.repository.UserAccountRepository;
+import com.smartheritage.backend.identity.security.JwtTokenService;
+import com.smartheritage.backend.heritage.repository.SupportedLanguageRepository;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,14 +24,20 @@ public class AuthService {
     private final UserAccountRepository users;
     private final RoleRepository roles;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenService tokenService;
+    private final SupportedLanguageRepository languages;
 
     public AuthService(
             UserAccountRepository users,
             RoleRepository roles,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JwtTokenService tokenService,
+            SupportedLanguageRepository languages) {
         this.users = users;
         this.roles = roles;
         this.passwordEncoder = passwordEncoder;
+        this.tokenService = tokenService;
+        this.languages = languages;
     }
 
     @Transactional
@@ -43,11 +51,14 @@ public class AuthService {
             throw new ConflictException("Email is already in use");
         }
         validatePasswordLength(request.password());
+        String languageCode = request.languageCode().trim().toLowerCase(Locale.ROOT);
+        languages.findByCodeIgnoreCaseAndActiveTrue(languageCode)
+                .orElseThrow(() -> new BadRequestException("Preferred language is not supported"));
         Role visitorRole = roles.findByNameIgnoreCase("VISITOR")
                 .orElseThrow(() -> new IllegalStateException("VISITOR role is missing from the database"));
         UserAccount user = users.save(new UserAccount(
                 username, email, passwordEncoder.encode(request.password()),
-                request.languageCode().trim().toLowerCase(Locale.ROOT), visitorRole));
+                languageCode, visitorRole));
         return toResponse(user);
     }
 
@@ -71,7 +82,9 @@ public class AuthService {
     }
 
     private AuthResponse toResponse(UserAccount user) {
+        JwtTokenService.IssuedToken token = tokenService.issue(user);
         return new AuthResponse(user.getId(), user.getUsername(), user.getEmail(),
-                user.getRole().getName(), user.getPreferredLanguage());
+                user.getRole().getName(), user.getPreferredLanguage(),
+                token.value(), "Bearer", token.expiresInSeconds());
     }
 }

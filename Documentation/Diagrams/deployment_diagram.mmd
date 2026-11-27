@@ -1,0 +1,20 @@
+flowchart TB
+    subgraph Devices["Thiết bị người dùng"]
+        Android["Android phone<br/>Smart Heritage App"]
+        Browser["Desktop / mobile browser<br/>Admin portal"]
+        Beacon["iBeacon devices<br/>UUID + major + minor"]
+    end
+
+    subgraph Server["Hạ tầng triển khai"]
+        TLS["HTTPS reverse proxy<br/>TLS 1.2+"]
+        App["Spring Boot 3 REST API<br/>JWT · CMS · experience · analytics"]
+        Media["Media volume<br/>ảnh · video · audio"]
+        Database[("PostgreSQL")]
+    end
+
+    Android -->|HTTPS API| TLS
+    Browser -->|HTTPS UI + API| TLS
+    Beacon -.->|BLE| Android
+    TLS --> App
+    App --> Database
+    App --> Media

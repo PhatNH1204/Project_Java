@@ -1,0 +1,26 @@
+sequenceDiagram
+    actor User as Người dùng
+    participant App as Mobile / Admin Web
+    participant Auth as AuthController
+    participant Service as AuthService
+    participant DB as PostgreSQL
+    participant JWT as JwtTokenService
+
+    User->>App: Gửi username/email và mật khẩu
+    App->>Auth: POST /api/auth/login
+    Auth->>Service: login(LoginRequest)
+    Service->>DB: Tìm tài khoản và vai trò
+    DB-->>Service: UserAccount
+    Service->>Service: Kiểm tra trạng thái + BCrypt
+    Service->>JWT: issue(user)
+    JWT-->>Service: JWT có role, jti, expiry
+    Service-->>Auth: AuthResponse + accessToken
+    Auth-->>App: 200 OK, Cache-Control: no-store
+    App->>Auth: GET /api/users/me + Bearer JWT
+    Auth->>DB: Xác thực token, trạng thái và quyền
+    DB-->>Auth: Tài khoản còn hoạt động
+    Auth-->>App: Hồ sơ
+    User->>App: Đăng xuất
+    App->>Auth: POST /api/auth/logout
+    Auth->>DB: Lưu jti vào revoked_token
+    Auth-->>App: 204 No Content

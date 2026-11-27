@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153a35">
+  <title>Smart Heritage | Quản trị</title>
+  <link rel="stylesheet" href="/admin/styles.css">
+  <script src="/admin/app.js" defer></script>
+</head>
+<body>
+  <main id="login-screen" class="login-shell">
+    <section class="login-card">
+      <div class="brand-mark" aria-hidden="true">SH</div>
+      <p class="eyebrow">SMART HERITAGE</p>
+      <h1>Cổng quản trị di sản</h1>
+      <p class="muted">Đăng nhập để quản lý nội dung, beacon và hoạt động tham quan.</p>
+      <form id="login-form" class="stack">
+        <label>Tài khoản hoặc email
+          <input name="identifier" autocomplete="username" required>
+        </label>
+        <label>Mật khẩu
+          <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="button primary" type="submit">Đăng nhập</button>
+      </form>
+      <p id="login-error" class="error" role="alert"></p>
+    </section>
+  </main>
+
+  <div id="app-shell" class="app-shell hidden">
+    <aside class="sidebar">
+      <a class="brand" href="/admin/"><span class="brand-mark">SH</span><span>Smart Heritage<small>Quản trị hệ thống</small></span></a>
+      <nav id="navigation" aria-label="Điều hướng">
+        <button class="nav-link active" data-view="dashboard">Tổng quan</button>
+        <button class="nav-link" data-view="sites">Khu di tích</button>
+        <button class="nav-link" data-view="artifacts">Hiện vật</button>
+        <button class="nav-link" data-view="beacons">iBeacon</button>
+        <button class="nav-link" data-view="feedback">Đánh giá</button>
+        <button class="nav-link" data-view="users">Tài khoản</button>
+        <button class="nav-link" data-view="languages">Ngôn ngữ</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <span id="current-user" class="muted"></span>
+        <button id="logout-button" class="button subtle" type="button">Đăng xuất</button>
+      </div>
+    </aside>
+    <section class="workspace">
+      <header class="topbar">
+        <div><p class="eyebrow">NỀN TẢNG QUẢN TRỊ</p><h1 id="page-title">Tổng quan</h1></div>
+        <div class="topbar-actions">
+          <select id="report-period" aria-label="Kỳ báo cáo">
+            <option value="daily">Hôm nay</option>
+            <option value="weekly">Tuần này</option>
+            <option value="monthly" selected>Tháng này</option>
+          </select>
+          <button id="download-excel" class="button outline" type="button">Tải Excel</button>
+          <button id="download-pdf" class="button outline" type="button">Tải PDF</button>
+        </div>
+      </header>
+      <p id="app-message" class="message" role="status"></p>
+      <div id="view-container"></div>
+    </section>
+  </div>
+</body>
+</html>

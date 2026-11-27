@@ -1,0 +1,21 @@
+sequenceDiagram
+    actor Visitor as Du khách
+    participant App as Android App
+    participant API as REST API
+    participant DB as PostgreSQL
+    participant Admin as Admin Web
+
+    Visitor->>App: Chấm điểm và gửi nhận xét
+    App->>API: POST /api/feedback + Bearer JWT
+    API->>API: Kiểm tra rating, tài khoản và artifact
+    API->>DB: Lưu phản hồi ở trạng thái PENDING
+    DB-->>API: Feedback
+    API-->>App: 201 Created
+    Admin->>API: GET /api/admin/feedback
+    API->>DB: Đọc phản hồi cần kiểm duyệt
+    DB-->>API: Danh sách phản hồi
+    API-->>Admin: Nội dung + trạng thái
+    Admin->>API: PATCH /api/admin/feedback/{id}
+    API->>DB: Duyệt hoặc từ chối
+    DB-->>API: Trạng thái mới
+    API-->>Admin: Kết quả kiểm duyệt

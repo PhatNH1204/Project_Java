@@ -1,73 +1,89 @@
-# TV1 - Đăng ký và đăng nhập
+# Backend Smart Heritage
 
-Backend Spring Boot đơn giản cho chức năng đăng ký và đăng nhập khách tham quan.
-Thông tin người dùng được lưu trong PostgreSQL, mật khẩu được mã hóa bằng BCrypt
-và mỗi tài khoản mới được gán vai trò `VISITOR`.
-
-> Bản này chỉ minh họa đăng ký/đăng nhập; chưa cấp JWT, quản lý hồ sơ, đổi mật
-> khẩu, refresh token hoặc có API dành riêng cho quản trị viên.
+REST API Spring Boot cho prototype Smart Heritage. Backend hỗ trợ đăng ký/đăng nhập JWT, phân quyền quản trị, quản lý di tích/hiện vật/nội dung đa ngôn ngữ, iBeacon, yêu thích/lịch sử tham quan/đánh giá, thống kê, báo cáo PDF/Excel và tài liệu OpenAPI.
 
 ## Yêu cầu
 
-- Java 17 trở lên
+- JDK 17
 - Maven 3.9 trở lên
-- PostgreSQL
+- PostgreSQL 16 trở lên hoặc Docker Desktop
+
+Xem [README chính](../../README.md) để biết hướng dẫn cài đặt Windows, chạy ứng dụng Android và giải thích về PostgreSQL/SSMS.
+
+## Chạy database cục bộ
+
+Từ thư mục này:
+
+```powershell
+docker compose up -d db
+```
+
+Compose chỉ dành cho phát triển cục bộ, mở PostgreSQL tại `localhost:5432`. Nếu đã có PostgreSQL, hãy tạo database và dùng thông tin tài khoản tương ứng.
 
 ## Chạy backend
 
-Tạo database PostgreSQL tên `smart_heritage`, sau đó mở PowerShell và chạy:
+Mở PowerShell tại `Code\Backend`, thiết lập các biến môi trường rồi chạy:
 
 ```powershell
-cd D:\Java\Project_Java\Code\Backend
-$env:POSTGRES_URL = "jdbc:postgresql://localhost:5432/smart_heritage"
-$env:POSTGRES_USER = "postgres"
-$env:POSTGRES_PASSWORD = "mật-khẩu-PostgreSQL-của-bạn"
+$env:POSTGRES_URL = 'jdbc:postgresql://localhost:5432/smart_heritage'
+$env:POSTGRES_USER = 'smart_heritage'
+$env:POSTGRES_PASSWORD = 'smart_heritage_dev'
+$secretBytes = New-Object byte[] 48
+$rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+$rng.GetBytes($secretBytes)
+$rng.Dispose()
+$env:JWT_SECRET = [Convert]::ToBase64String($secretBytes)
+$env:ADMIN_USERNAME = 'admin'
+$env:ADMIN_EMAIL = 'admin@localhost'
+$env:ADMIN_PASSWORD = 'ChangeThisAdminPassword123'
 mvn spring-boot:run
 ```
 
-Flyway sẽ tự tạo các bảng `app_role`, `app_user` và thêm các vai trò Visitor,
-Administrator. Hibernate kiểm tra cấu trúc database khi ứng dụng khởi động.
+Đặt mật khẩu quản trị riêng, tối thiểu 12 ký tự. Tài khoản được bootstrap nếu chưa tồn tại. Flyway áp dụng migration và Hibernate kiểm tra cấu trúc database.
 
-## Thử API
+Mặc định trang quản trị được phục vụ từ `Code\Admin`. Đặt biến `ADMIN_UI_DIR` nếu muốn dùng thư mục khác.
 
-### Đăng ký
+## Địa chỉ hữu ích
 
-Mở một cửa sổ PowerShell khác khi backend đang chạy:
+- Trang vào: <http://localhost:8080/>
+- Cổng quản trị: <http://localhost:8080/admin>
+- Swagger UI: <http://localhost:8080/swagger-ui.html>
+- OpenAPI JSON: <http://localhost:8080/v3/api-docs>
 
-```powershell
-$body = @{
-    username = "visitor01"
-    email = "visitor@example.com"
-    password = "StrongPassword123"
-    languageCode = "vi"
-} | ConvertTo-Json
+## Ví dụ API
 
-Invoke-RestMethod -Method Post `
-    -Uri "http://localhost:8080/api/auth/register" `
-    -ContentType "application/json" -Body $body
-```
-
-### Đăng nhập
-
-Có thể đăng nhập bằng email hoặc username:
+Đăng ký khách tham quan:
 
 ```powershell
 $body = @{
-    identifier = "visitor@example.com"
-    password = "StrongPassword123"
+    username = 'visitor01'
+    email = 'visitor@example.com'
+    password = 'StrongPassword123'
+    languageCode = 'vi'
 } | ConvertTo-Json
 
 Invoke-RestMethod -Method Post `
-    -Uri "http://localhost:8080/api/auth/login" `
-    -ContentType "application/json" -Body $body
+    -Uri 'http://localhost:8080/api/auth/register' `
+    -ContentType 'application/json' -Body $body
 ```
 
-Đăng ký lại bằng username hoặc email đã tồn tại sẽ bị từ chối.
+Đăng nhập bằng email hoặc tên đăng nhập:
 
-## Chạy kiểm thử
+```powershell
+$body = @{
+    identifier = 'visitor@example.com'
+    password = 'StrongPassword123'
+} | ConvertTo-Json
+
+Invoke-RestMethod -Method Post `
+    -Uri 'http://localhost:8080/api/auth/login' `
+    -ContentType 'application/json' -Body $body
+```
+
+## Kiểm thử
 
 ```powershell
 mvn test
 ```
 
-Các integration test sử dụng H2 trong bộ nhớ nên không cần PostgreSQL.
+Integration test dùng H2 ở chế độ tương thích PostgreSQL nên không cần bật PostgreSQL.

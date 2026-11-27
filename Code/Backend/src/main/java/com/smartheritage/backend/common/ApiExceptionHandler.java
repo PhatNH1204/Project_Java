@@ -12,9 +12,15 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.smartheritage.backend.heritage.service.MediaStorageException;
+import com.smartheritage.backend.heritage.service.ReportGenerationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidation(
@@ -45,6 +51,12 @@ public class ApiExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", exception.getMessage(), request, Map.of());
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ApiError> handleNotFound(
+            NotFoundException exception, HttpServletRequest request) {
+        return error(HttpStatus.NOT_FOUND, "NOT_FOUND", exception.getMessage(), request, Map.of());
+    }
+
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ApiError> handleInvalidCredentials(
             InvalidCredentialsException exception, HttpServletRequest request) {
@@ -57,6 +69,22 @@ public class ApiExceptionHandler {
             DataIntegrityViolationException exception, HttpServletRequest request) {
         return error(HttpStatus.CONFLICT, "CONFLICT",
                 "The requested change conflicts with existing data", request, Map.of());
+    }
+
+    @ExceptionHandler(MediaStorageException.class)
+    public ResponseEntity<ApiError> handleMediaStorage(
+            MediaStorageException exception, HttpServletRequest request) {
+        LOGGER.error("Media upload failed", exception);
+        return error(HttpStatus.INTERNAL_SERVER_ERROR, "MEDIA_STORAGE_FAILED",
+                "The uploaded media could not be stored", request, Map.of());
+    }
+
+    @ExceptionHandler(ReportGenerationException.class)
+    public ResponseEntity<ApiError> handleReportGeneration(
+            ReportGenerationException exception, HttpServletRequest request) {
+        LOGGER.error("Report generation failed", exception);
+        return error(HttpStatus.INTERNAL_SERVER_ERROR, "REPORT_GENERATION_FAILED",
+                "The report could not be generated", request, Map.of());
     }
 
     private ResponseEntity<ApiError> error(

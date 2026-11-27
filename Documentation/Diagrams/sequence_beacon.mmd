@@ -1,0 +1,27 @@
+sequenceDiagram
+    actor Visitor as Du khách
+    participant App as Android App
+    participant BLE as BeaconScanner
+    participant API as Spring Boot API
+    participant DB as PostgreSQL
+
+    Visitor->>App: Bật dò beacon
+    App->>BLE: startScan()
+    BLE-->>App: UUID, major, minor, RSSI
+    App->>App: So khớp vùng beacon hiện tại
+    alt Beacon mới hoặc vừa vào vùng
+        App->>API: GET /api/beacons/resolve
+        API->>DB: Tìm beacon đang hoạt động + artifact
+        DB-->>API: Beacon assignment + bản dịch
+        API-->>App: Nội dung hiện vật
+        App-->>Visitor: Hiển thị nội dung và thông báo
+        App->>App: Lưu eventKey và thời điểm bắt đầu
+    else Cùng beacon đang ở trong vùng
+        App->>App: Không gửi thông báo lặp
+    end
+    alt Beacon đổi hoặc rời vùng
+        App->>API: POST /api/interactions
+        API->>DB: Lưu eventKey duy nhất, khách, hiện vật, thời lượng
+        DB-->>API: Interaction
+        API-->>App: Kết quả ghi nhận
+    end

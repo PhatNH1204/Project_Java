@@ -1,0 +1,48 @@
+flowchart LR
+    Visitor[Du khách]
+    Admin[Quản trị viên]
+    Beacon[Thiết bị iBeacon]
+
+    subgraph Mobile["Ứng dụng du khách"]
+        UCAuth([Đăng ký / đăng nhập / đăng xuất])
+        UCProfile([Quản lý hồ sơ và ngôn ngữ])
+        UCSites([Xem khu di tích, bản đồ])
+        UCArtifacts([Tìm và xem hiện vật])
+        UCMedia([Xem ảnh, video, audio, bản dịch])
+        UCFavorite([Quản lý yêu thích])
+        UCHistory([Xem lịch sử tham quan])
+        UCFeedback([Đánh giá và gửi phản hồi])
+        UCBeacon([Nhận nội dung theo beacon])
+    end
+
+    subgraph AdminPortal["Cổng quản trị web"]
+        UCMUsers([Quản lý tài khoản])
+        UCMContent([Quản lý khu di tích và hiện vật])
+        UCMTranslation([Quản lý bản dịch và media])
+        UCMBeacon([Đăng ký và gán beacon])
+        UCModerate([Kiểm duyệt phản hồi])
+        UCAnalytics([Xem thống kê và báo cáo])
+        UCExport([Xuất PDF / Excel])
+    end
+
+    Visitor --> UCAuth
+    Visitor --> UCProfile
+    Visitor --> UCSites
+    Visitor --> UCArtifacts
+    Visitor --> UCMedia
+    Visitor --> UCFavorite
+    Visitor --> UCHistory
+    Visitor --> UCFeedback
+    Visitor --> UCBeacon
+    Beacon -. "BLE advertisement" .-> UCBeacon
+
+    Admin --> UCAuth
+    Admin --> UCMUsers
+    Admin --> UCMContent
+    Admin --> UCMTranslation
+    Admin --> UCMBeacon
+    Admin --> UCModerate
+    Admin --> UCAnalytics
+    Admin --> UCExport
+    UCExport --> UCAnalytics
+    UCBeacon --> UCArtifacts

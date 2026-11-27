@@ -5,5 +5,8 @@ public record AuthResponse(
         String username,
         String email,
         String role,
-        String preferredLanguage) {
+        String preferredLanguage,
+        String accessToken,
+        String tokenType,
+        long expiresIn) {
 }

@@ -11,6 +11,25 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
 
 server:
   port: ${PORT:8080}
+
+app:
+  security:
+    jwt-secret: ${JWT_SECRET}
+    token-minutes: ${JWT_TOKEN_MINUTES:480}
+  bootstrap:
+    admin-username: ${ADMIN_USERNAME:}
+    admin-email: ${ADMIN_EMAIL:}
+    admin-password: ${ADMIN_PASSWORD:}
+  upload-dir: ${UPLOAD_DIR:./uploads}
+  admin-ui-dir: ${ADMIN_UI_DIR:../Admin/}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

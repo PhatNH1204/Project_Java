@@ -1,0 +1,121 @@
+classDiagram
+    class AuthController {
+        +register(RegisterRequest)
+        +login(LoginRequest)
+        +logout(Jwt)
+    }
+    class AuthService {
+        +register(RegisterRequest) AuthResponse
+        +login(LoginRequest) AuthResponse
+    }
+    class JwtTokenService {
+        +issue(UserAccount) IssuedToken
+    }
+    class UserController {
+        +profile(Jwt)
+        +updateProfile(Jwt, ProfileUpdateRequest)
+        +changePassword(Jwt, ChangePasswordRequest)
+    }
+    class UserService {
+        +profile(userId) UserProfileResponse
+        +updateProfile(userId, request) UserProfileResponse
+        +changePassword(userId, request)
+    }
+    class UserAccount {
+        -Long id
+        -String username
+        -String email
+        -String passwordHash
+        -String preferredLanguage
+        -boolean active
+        +updateProfile()
+        +updatePasswordHash()
+    }
+    class Role {
+        -Integer id
+        -String name
+    }
+    class CatalogController {
+        +sites()
+        +artifacts(siteId, search, lang)
+        +resolveBeacon(uuid, major, minor, lang)
+    }
+    class CatalogService {
+        +artifacts(siteId, search, lang)
+        +artifact(id, lang)
+        +resolveBeacon(uuid, major, minor, lang)
+    }
+    class AdminCatalogController {
+        +manageSites()
+        +manageArtifacts()
+        +manageBeacons()
+        +manageLanguages()
+    }
+    class AdminCatalogService
+    class HeritageSite {
+        -Long id
+        -String name
+        -String address
+        -BigDecimal latitude
+        -BigDecimal longitude
+        -boolean active
+    }
+    class Artifact {
+        -Long id
+        -String code
+        -String locationName
+        -boolean active
+    }
+    class ArtifactContent {
+        -String languageCode
+        -String title
+        -String description
+        -String imageUrl
+        -String videoUrl
+        -String audioUrl
+    }
+    class BeaconDevice {
+        -String beaconUuid
+        -int major
+        -int minor
+        -int txPower
+        -boolean active
+    }
+    class VisitorService {
+        +favorites(userId, language)
+        +history(userId)
+        +recordInteraction(userId, request)
+        +submitFeedback(userId, request)
+    }
+    class Favorite
+    class VisitorInteraction
+    class VisitorFeedback
+    class AnalyticsService {
+        +dashboard(period) AnalyticsDashboard
+    }
+    class ReportService {
+        +pdf(period) byte[]
+        +excel(period) byte[]
+    }
+
+    AuthController --> AuthService
+    AuthService --> JwtTokenService
+    AuthService --> UserAccount
+    UserController --> UserService
+    UserService --> UserAccount
+    UserAccount --> Role
+    CatalogController --> CatalogService
+    AdminCatalogController --> AdminCatalogService
+    AdminCatalogService --> HeritageSite
+    AdminCatalogService --> Artifact
+    AdminCatalogService --> ArtifactContent
+    AdminCatalogService --> BeaconDevice
+    HeritageSite "1" --> "*" Artifact
+    Artifact "1" --> "*" ArtifactContent
+    Artifact "1" --> "*" BeaconDevice
+    VisitorService --> Favorite
+    VisitorService --> VisitorInteraction
+    VisitorService --> VisitorFeedback
+    VisitorService --> Artifact
+    AnalyticsService --> VisitorInteraction
+    ReportService --> AnalyticsService

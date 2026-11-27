@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: smart_heritage
+      POSTGRES_USER: smart_heritage
+      POSTGRES_PASSWORD: smart_heritage_dev
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - smart-heritage-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smart_heritage -d smart_heritage"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  smart-heritage-postgres:

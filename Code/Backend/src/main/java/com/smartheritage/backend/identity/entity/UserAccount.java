@@ -86,4 +86,18 @@ public class UserAccount {
     public Role getRole() {
         return role;
     }
+
+    public void updateProfile(String username, String email, String preferredLanguage) {
+        this.username = username;
+        this.email = email;
+        this.preferredLanguage = preferredLanguage;
+    }
+
+    public void updatePasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

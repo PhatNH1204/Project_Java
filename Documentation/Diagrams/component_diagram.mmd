@@ -1,0 +1,24 @@
+flowchart LR
+    VisitorApp["Ứng dụng Android<br/>Katalog · tài khoản · yêu thích · lịch sử"]
+    Ble["iBeacon/BLE<br/>quét UUID · major · minor · RSSI"]
+    AdminWeb["Cổng quản trị responsive<br/>CMS · beacon · dashboard"]
+    API["Smart Heritage REST API"]
+    Auth["Identity API<br/>JWT · RBAC · hồ sơ"]
+    Catalog["Catalog/CMS API<br/>site · artifact · bản dịch · media"]
+    Experience["Experience API<br/>resolve beacon · interaction · favorites"]
+    Analytics["Feedback & Analytics API<br/>dashboard · PDF · Excel"]
+    DB[("PostgreSQL")]
+    Uploads[("Media storage")]
+
+    VisitorApp -->|HTTPS / JSON| API
+    Ble -->|BLE advertisements| VisitorApp
+    AdminWeb -->|HTTPS / JSON| API
+    API --> Auth
+    API --> Catalog
+    API --> Experience
+    API --> Analytics
+    Auth --> DB
+    Catalog --> DB
+    Experience --> DB
+    Analytics --> DB
+    Catalog --> Uploads

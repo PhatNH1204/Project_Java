@@ -1,0 +1,32 @@
+flowchart TD
+    Start((Bắt đầu))
+    Login{Đã đăng nhập?}
+    SignIn[Đăng nhập / đăng ký]
+    Choose{Chọn cách khám phá}
+    Browse[Xem danh sách hoặc tìm hiện vật]
+    Scan[Quét quảng bá BLE]
+    Nearby{Beacon hợp lệ ở gần?}
+    Same{Có phải beacon đang hoạt động?}
+    Resolve[Gọi API resolve beacon]
+    Content[Tải nội dung theo ngôn ngữ]
+    Notify[Hiển thị nội dung / thông báo]
+    Record[Ghi tương tác khi rời beacon hoặc chuyển vùng]
+    Offline[Hiển thị nội dung đã lưu]
+    Personal[Quản lý yêu thích, lịch sử, đánh giá]
+    End((Tiếp tục tham quan))
+
+    Start --> Login
+    Login -- Chưa --> SignIn --> Choose
+    Login -- Rồi --> Choose
+    Choose -- Thủ công --> Browse --> Content
+    Choose -- Tự động --> Scan --> Nearby
+    Nearby -- Không --> Scan
+    Nearby -- Có --> Same
+    Same -- Có --> Scan
+    Same -- Không --> Resolve
+    Resolve --> Content
+    Resolve -. Mất mạng .-> Offline
+    Content --> Notify --> Record --> Scan
+    Offline --> Personal
+    Browse --> Personal
+    Personal --> End
